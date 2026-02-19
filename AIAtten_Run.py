@@ -31,7 +31,7 @@ bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 window.geometry('1280x720')
 window.configure(background='grey20')
 
-# GUI for manually fill attendance
+# GUI for manually Mark Attendance
 
 
 def manually_fill():
@@ -84,7 +84,7 @@ def manually_fill():
 
         sql = "CREATE TABLE " + DB_table_name + """
                         (ID INT NOT NULL AUTO_INCREMENT,
-                         ENROLLMENT varchar(100) NOT NULL,
+                         SRN varchar(100) NOT NULL,
                          NAME VARCHAR(50) NOT NULL,
                          DATE VARCHAR(20) NOT NULL,
                          TIME VARCHAR(20) NOT NULL,
@@ -117,7 +117,7 @@ def manually_fill():
                 # errsc2.iconbitmap('AMS.ico')
                 errsc2.title('Warning!!')
                 errsc2.configure(background='grey80')
-                Label(errsc2, text='Please enter Student & Enrollment!!!', fg='black', bg='white',
+                Label(errsc2, text='Please enter Student & SRN!!!', fg='black', bg='white',
                       font=('times', 16, ' bold ')).pack()
                 Button(errsc2, text='OK', command=del_errsc2, fg="black", bg="lawn green", width=9, height=1,
                        activebackground="Red", font=('times', 15, ' bold ')).place(x=90, y=50)
@@ -128,7 +128,7 @@ def manually_fill():
                         return False
                 return True
 
-            ENR = tk.Label(MFW, text="Enter Enrollment", width=15, height=2, fg="black", bg="grey",
+            ENR = tk.Label(MFW, text="Enter SRN", width=15, height=2, fg="black", bg="grey",
                            font=('times', 15))
             ENR.place(x=30, y=100)
 
@@ -155,9 +155,9 @@ def manually_fill():
 
             # get important variable
             def enter_data_DB():
-                ENROLLMENT = ENR_ENTRY.get()
+                SRN = ENR_ENTRY.get()
                 STUDENT = STUDENT_ENTRY.get()
-                if ENROLLMENT == '':
+                if SRN == '':
                     err_screen1()
                 elif STUDENT == '':
                     err_screen1()
@@ -166,8 +166,8 @@ def manually_fill():
                         ts).strftime('%H:%M:%S')
                     Hour, Minute, Second = time.split(":")
                     Insert_data = "INSERT INTO " + DB_table_name + \
-                        " (ID,ENROLLMENT,NAME,DATE,TIME) VALUES (0, %s, %s, %s,%s)"
-                    VALUES = (str(ENROLLMENT), str(
+                        " (ID,SRN,NAME,DATE,TIME) VALUES (0, %s, %s, %s,%s)"
+                    VALUES = (str(SRN), str(
                         STUDENT), str(Date), str(time))
                     try:
                         cursor.execute(Insert_data, VALUES)
@@ -179,7 +179,7 @@ def manually_fill():
             def create_csv():
                 import csv
                 cursor.execute("select * from " + DB_table_name + ";")
-                csv_name = 'C:/Users/Pragya singh/PycharmProjects/Attendace_management_system/Attendance/Manually Attendance/'+DB_table_name+'.csv'
+                csv_name = os.path.join(SCRIPT_DIR, "Attendance", DB_table_name + ".csv")
                 with open(csv_name, "w") as csv_file:
                     csv_writer = csv.writer(csv_file)
                     csv_writer.writerow(
@@ -235,7 +235,7 @@ def manually_fill():
             def attf():
                 import subprocess
                 subprocess.Popen(
-                    r'explorer /select,"C:\Users\Pragya Singh\PycharmProjects\Attendace_management_system\Attendance\Manually Attendance\-------Check atttendance-------"')
+                    r'explorer /select,"D:\Attendance\Check"')
 
             attf = tk.Button(MFW,  text="Check Sheets", command=attf, fg="white", bg="black",
                              width=12, height=1, activebackground="white", font=('times', 14, ' bold '))
@@ -253,7 +253,7 @@ def manually_fill():
                          fg="black", font=('times', 23))
     SUB_ENTRY.place(x=250, y=105)
 
-    fill_manual_attendance = tk.Button(sb, text="Fill Attendance", command=fill_attendance, fg="black", bg="SkyBlue1", width=20, height=2,
+    fill_manual_attendance = tk.Button(sb, text="Mark Attendance", command=fill_attendance, fg="black", bg="SkyBlue1", width=20, height=2,
                                        activebackground="white", font=('times', 15, ' bold '))
     fill_manual_attendance.place(x=250, y=160)
     sb.mainloop()
@@ -280,7 +280,7 @@ def err_screen():
     # sc1.iconbitmap('AMS.ico')
     sc1.title('Warning!!')
     sc1.configure(background='grey80')
-    Label(sc1, text='Enrollment & Name required!!!', fg='black',
+    Label(sc1, text='SRN & Name required!!!', fg='black',
           bg='white', font=('times', 16)).pack()
     Button(sc1, text='OK', command=del_sc1, fg="black", bg="lawn green", width=9,
            height=1, activebackground="Red", font=('times', 15, ' bold ')).place(x=90, y=50)
@@ -319,7 +319,7 @@ def take_img():
             cam = cv2.VideoCapture(0)
             detector = cv2.CascadeClassifier(
                 'haarcascade_frontalface_default.xml')
-            Enrollment = txt.get()
+            SRN = txt.get()
             Name = txt2.get()
             sampleNum = 0
             while (True):
@@ -331,9 +331,9 @@ def take_img():
                     # incrementing sample number
                     sampleNum = sampleNum + 1
                     # saving the captured face in the dataset folder
-                    cv2.imwrite("TrainingImage/ " + Name + "." + Enrollment + '.' + str(sampleNum) + ".jpg",
+                    cv2.imwrite("TrainingImage/ " + Name + "." + SRN + '.' + str(sampleNum) + ".jpg",
                                 gray)
-                    print("Images Saved for Enrollment :")
+                    print("Images Saved for SRN :")
                     cv2.imshow('Frame', img)
                 # wait for 100 miliseconds
                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -349,22 +349,22 @@ def take_img():
             ts = time.time()
             Date = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
             Time = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
-            new_row = [Enrollment, Name, Date, Time]
+            new_row = [SRN, Name, Date, Time]
             csv_path = os.path.join(SCRIPT_DIR, 'StudentDetails', 'StudentDetails.csv')
             os.makedirs(os.path.dirname(csv_path), exist_ok=True)
-            all_rows = [['Enrollment', 'Name', 'Date', 'Time']]
+            all_rows = [['SRN', 'Name', 'Date', 'Time']]
             if os.path.exists(csv_path):
                 with open(csv_path, 'r', newline='', encoding='utf-8') as f:
                     reader = csv.reader(f)
                     header = next(reader, None)
                     for r in reader:
                         if r and len(r) >= 2:
-                            if str(r[0]) != str(Enrollment):
+                            if str(r[0]) != str(SRN):
                                 all_rows.append(r)
             all_rows.append(new_row)
             with open(csv_path, 'w', newline='', encoding='utf-8') as f:
                 csv.writer(f, delimiter=',').writerows(all_rows)
-            res = "Images Saved for Enrollment : " + Enrollment + " Name : " + Name
+            res = "Images Saved for SRN : " + SRN + " Name : " + Name
             Notification.configure(
                 text=res, bg="SpringGreen3", width=50, font=('times', 18, 'bold'))
             Notification.place(x=250, y=400)
@@ -374,7 +374,7 @@ def take_img():
             Notification.place(x=450, y=400)
 
 
-# for choose subject and fill attendance
+# for choose subject and Mark Attendance
 def subjectchoose():
     def Fillattendances():
         sub = tx.get()
@@ -398,7 +398,7 @@ def subjectchoose():
                 df = pd.read_csv("StudentDetails\StudentDetails.csv")
                 cam = cv2.VideoCapture(0)
                 font = cv2.FONT_HERSHEY_SIMPLEX
-                col_names = ['Enrollment', 'Name', 'Date', 'Time']
+                col_names = ['SRN', 'Name', 'Date', 'Time']
                 attendance = pd.DataFrame(columns=col_names)
                 while True:
                     ret, im = cam.read()
@@ -420,7 +420,7 @@ def subjectchoose():
                                 ts).strftime('%Y-%m-%d')
                             timeStamp = datetime.datetime.fromtimestamp(
                                 ts).strftime('%H:%M:%S')
-                            aa = df.loc[df['Enrollment'] == Id]['Name'].values
+                            aa = df.loc[df['SRN'] == Id]['Name'].values
                             global tt
                             tt = str(Id) + "-" + aa
                             En = '15624031' + str(Id)
@@ -442,7 +442,7 @@ def subjectchoose():
                         break
 
                     attendance = attendance.drop_duplicates(
-                        ['Enrollment'], keep='first')
+                        ['SRN'], keep='first')
                     cv2.imshow('Filling attedance..', im)
                     key = cv2.waitKey(30) & 0xff
                     if key == 27:
@@ -456,7 +456,7 @@ def subjectchoose():
                 fileName = "Attendance/" + Subject + "_" + date + \
                     "_" + Hour + "-" + Minute + "-" + Second + ".csv"
                 attendance = attendance.drop_duplicates(
-                    ['Enrollment'], keep='first')
+                    ['SRN'], keep='first')
                 print(attendance)
                 attendance.to_csv(fileName, index=False)
 
@@ -477,7 +477,7 @@ def subjectchoose():
 
                 sql = "CREATE TABLE " + DB_Table_name + """
                 (ID INT NOT NULL AUTO_INCREMENT,
-                 ENROLLMENT varchar(100) NOT NULL,
+                 SRN varchar(100) NOT NULL,
                  NAME VARCHAR(50) NOT NULL,
                  DATE VARCHAR(20) NOT NULL,
                  TIME VARCHAR(20) NOT NULL,
@@ -486,7 +486,7 @@ def subjectchoose():
                 """
                 # Now enter attendance in Database
                 insert_data = "INSERT INTO " + DB_Table_name + \
-                    " (ID,ENROLLMENT,NAME,DATE,TIME) VALUES (0, %s, %s, %s,%s)"
+                    " (ID,SRN,NAME,DATE,TIME) VALUES (0, %s, %s, %s,%s)"
                 VALUES = (str(Id), str(aa), str(date), str(timeStamp))
                 try:
                     cursor.execute(sql)  # for create a table
@@ -604,7 +604,7 @@ def subjectchoose():
                   fg="black", font=('times', 23))
     tx.place(x=250, y=105)
 
-    fill_a = tk.Button(windo, text="Fill Attendance", fg="white", command=Fillattendances, bg="SkyBlue1", width=20, height=2,
+    fill_a = tk.Button(windo, text="Mark Attendance", fg="white", command=Fillattendances, bg="SkyBlue1", width=20, height=2,
                        activebackground="white", font=('times', 15, ' bold '))
     fill_a.place(x=250, y=160)
     windo.mainloop()
@@ -778,7 +778,7 @@ message.place(x=80, y=20)
 Notification = tk.Label(window, text="All things good", bg="Green", fg="white", width=15,
                         height=3, font=('times', 17))
 
-lbl = tk.Label(window, text="Enter Enrollment : ", width=20, height=2,
+lbl = tk.Label(window, text="Enter SRN : ", width=20, height=2,
                fg="black", bg="grey", font=('times', 15, 'bold'))
 lbl.place(x=200, y=200)
 
